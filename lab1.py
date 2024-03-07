@@ -27,22 +27,24 @@ ndc_coordinates = inp_to_ndc(input_x, input_y, input_width, input_height)
 user_coordinates = ndc_to_user(*ndc_coordinates, input_width, input_height)
 dc_coordinates = ndc_to_dc(*ndc_coordinates, dc_width=200, dc_height=120)
 
-plt.figure(figsize=(10, 4))
+fig, axs = plt.subplots(1, 3, figsize=(10, 4))
 
-plt.subplot(131)
-plt.scatter(input_x, input_y, label='Input Coordinates')
-plt.title('Input Coordinates')
-plt.legend()
+axs[0].scatter(input_x, input_y, label='Input Coordinates')
+axs[0].set_title('Input Coordinates')
 
-plt.subplot(132)
-plt.scatter(*ndc_coordinates, label='NDC Coordinates')
-plt.title('NDC Coordinates')
-plt.legend()
+axs[1].scatter(*ndc_coordinates, label='NDC Coordinates')
+axs[1].set_title('NDC Coordinates')
 
-plt.subplot(133)
-plt.scatter(*dc_coordinates, label='DC Coordinates')
-plt.title('DC Coordinates')
-plt.legend()
+axs[2].scatter(*dc_coordinates, label='DC Coordinates')
+axs[2].set_title('DC Coordinates')
 
 plt.tight_layout()
+
+def on_move(event):
+    if event.inaxes is not None:
+        x, y = event.xdata, event.ydata
+        print(f"Mouse position: x={x}, y={y}")
+
+fig.canvas.mpl_connect('motion_notify_event', on_move)
+
 plt.show()
