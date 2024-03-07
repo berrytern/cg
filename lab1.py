@@ -20,31 +20,25 @@ def ndc_to_dc(ndc_x, ndc_y, dc_width, dc_height):
     dc_y = ndc_y * dc_height
     return dc_x, dc_y
 
-# Valores de entrada
 input_x, input_y = 50, 30
 input_width, input_height = 100, 60
 
-# Transformação de coordenadas
 ndc_coordinates = inp_to_ndc(input_x, input_y, input_width, input_height)
 user_coordinates = ndc_to_user(*ndc_coordinates, input_width, input_height)
 dc_coordinates = ndc_to_dc(*ndc_coordinates, dc_width=200, dc_height=120)
 
-# Plotagem
 plt.figure(figsize=(10, 4))
 
-# Subplot 1: Coordenadas de entrada
 plt.subplot(131)
 plt.scatter(input_x, input_y, label='Input Coordinates')
 plt.title('Input Coordinates')
 plt.legend()
 
-# Subplot 2: Coordenadas normalizadas (NDC)
 plt.subplot(132)
 plt.scatter(*ndc_coordinates, label='NDC Coordinates')
 plt.title('NDC Coordinates')
 plt.legend()
 
-# Subplot 3: Coordenadas de dispositivo (DC)
 plt.subplot(133)
 plt.scatter(*dc_coordinates, label='DC Coordinates')
 plt.title('DC Coordinates')
