@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinate Systems Transformation</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 100vh;
+    }
+
+    #sidebar-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #3498db; /* Azul */
+        padding: 20px;
+    }
+
+    #sidebar {
+        margin-bottom: 20px;
+    }
+
+    #canvas-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ecf0f1; /* Cinza claro */
+        padding: 20px;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: white;
+    }
+
+    label {
+        font-weight: bold;
+        color: white;
+    }
+
+    input[type="number"] {
+        width: 60px;
+        padding: 5px;
+        margin-right: 10px;
+    }
+
+    button {
+        padding: 8px 20px;
+        background-color: #2ecc71; /* Verde */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #27ae60; /* Verde mais escuro */
+    }
+
+    #coordinates {
+        color: white;
+        margin-top: 20px;
+    }
+
+    #coordinates p {
+        margin-bottom: 5px;
+    }
+
+    canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+
+<div id="sidebar-container">
+    <div id="sidebar">
+        <h2>Coordinate Systems Transformation</h2>
+
+        <label for="inputX">Input X Coordinate:</label>
+        <input type="number" id="inputX" min="-1" max="1" step="0.01" value="0.5">
+        <label for="inputY">Input Y Coordinate:</label>
+        <input type="number" id="inputY" min="-1" max="1" step="0.01" value="-0.5">
+        <label for="pixelSize">Pixel Size:</label>
+        <input type="number" id="pixelSize" min="1" max="20" value="5">
+        <br>
+        <label for="canvasWidth">Canvas Width:</label>
+        <input type="number" id="canvasWidth" min="100" max="1000" value="500">
+        <label for="canvasHeight">Canvas Height:</label>
+        <input type="number" id="canvasHeight" min="100" max="1000" value="300">
+        <button onclick="transformCoordinates()">Transform</button>
+
+        <div id="coordinates">
+            <p>NDC Coordinate: <span id="ndcCoord"></span></p>
+            <p>User Coordinate: <span id="userCoord"></span></p>
+            <p>DC Coordinate: <span id="dcCoord"></span></p>
+        </div>
+    </div>
+</div>
+
+<div id="canvas-container">
+    <canvas id="canvas"></canvas>
+</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let pixelSize = 5; // Default size of the pixel square
+
+    // Definir os intervalos de variação
+    let minX = -1;
+    let maxX = 1;
+    let minY = -1;
+    let maxY = 1;
+
+    // Define the transformation functions
+    function inp_to_ndc(x, y) {
+        let ndc_x = (x - minX) / (maxX - minX) * 2 - 1;
+        let ndc_y = (y - minY) / (maxY - minY) * 2 - 1;
+        return { x: ndc_x, y: ndc_y };
+    }
+
+    function ndc_to_user(ndc_x, ndc_y) {
+        let user_x = ndc_x * (maxX - minX) / 2 + (maxX + minX) / 2;
+        let user_y = ndc_y * (maxY - minY) / 2 + (maxY + minY) / 2;
+        return { x: user_x, y: user_y };
+    }
+
+    function user_to_ndc(user_x, user_y) {
+        let ndc_x = (user_x - (maxX + minX) / 2) / ((maxX - minX) / 2);
+        let ndc_y = (user_y - (maxY + minY) / 2) / ((maxY - minY) / 2);
+        return { x: ndc_x, y: ndc_y };
+    }
+
+    function ndc_to_dc(ndc_x, ndc_y) {
+        let dc_x = ndc_x * 50;
+        let dc_y = ndc_y * 50;
+        return { x: dc_x, y: dc_y };
+    }
+
+    function transformCoordinates() {
+        const inputX = parseFloat(document.getElementById('inputX').value);
+        const inputY = parseFloat(document.getElementById('inputY').value);
+
+        const ndcCoordinates = inp_to_ndc(inputX, inputY);
+        const userCoordinates = ndc_to_user(ndcCoordinates.x, ndcCoordinates.y);
+        const dcCoordinates = ndc_to_dc(ndcCoordinates.x, ndcCoordinates.y);
+        pixelSize = parseInt(document.getElementById('pixelSize').value);
+
+        document.getElementById('ndcCoord').innerText = "(" + ndcCoordinates.x.toFixed(2) + ", " + ndcCoordinates.y.toFixed(2) + ")";
+        document.getElementById('userCoord').innerText = "(" + userCoordinates.x.toFixed(2) + ", " + userCoordinates.y.toFixed(2) + ")";
+        document.getElementById('dcCoord').innerText = "(" + dcCoordinates.x + ", " + dcCoordinates.y + ")";
+
+        // Set canvas size
+        const canvasWidth = parseInt(document.getElementById('canvasWidth').value);
+        const canvasHeight = parseInt(document.getElementById('canvasHeight').value);
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+
+        // Clear previous drawings
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw a point using the DC coordinate
+        ctx.fillStyle = 'red';
+        const pixelX = dcCoordinates.x - pixelSize / 2;
+        const pixelY = canvas.height / 2 - dcCoordinates.y - pixelSize / 2;
+        ctx.fillRect(pixelX, pixelY, pixelSize, pixelSize);
+    }
+
+    // Initially transform coordinates with default input value
+    transformCoordinates();
+</script>
+
+</body>
+</html>
+
