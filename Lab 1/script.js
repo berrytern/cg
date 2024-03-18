@@ -63,18 +63,29 @@ function draw() {
     document.querySelector('#desenhar').onclick = () => {
         background(0);
         // inputs do html
-        const x = document.querySelector('#x').value;
-        const xMax = document.querySelector('#xMax').value;
-        const xMin = document.querySelector('#xMin').value;
-        const y = document.querySelector('#y').value;
-        const yMax = document.querySelector('#yMax').value;
-        const yMin = document.querySelector('#yMin').value;
+        const x = parseFloat(document.querySelector('#x').value);
+        const xMax = parseFloat(document.querySelector('#xMax').value);
+        const xMin = parseFloat(document.querySelector('#xMin').value);
+        const y = parseFloat(document.querySelector('#y').value);
+        const yMax = parseFloat(document.querySelector('#yMax').value);
+        const yMin = parseFloat(document.querySelector('#yMin').value);
 
         let [xFinal, yFinal] = inp_to_dc(x, y, [xMin, xMax], [yMin, yMax]);
 
         if (xFinal && yFinal) {
             desenharPixel(xFinal, ALTURA - yFinal);
         }
+
+        // Calculando valores para exibir
+        const [ndcx, ndcy] = inp_to_ndc(x, y, [xMin, xMax], [yMin, yMax]);
+        const [dcx, dcy] = ndc_to_dc(ndcx, ndcy, INTERVALO_X_DC, INTERVALO_Y_DC);
+
+        // Exibindo os resultados nas divs
+        document.getElementById('inp_to_ndc_info').innerHTML = `inp_to_ndc:<br>x: ${ndcx.toFixed(2)}, y: ${ndcy.toFixed(2)}`;
+        document.getElementById('ndc_to_dc_info').innerHTML = `ndc_to_dc:<br>x: ${dcx}, y: ${dcy}`;
+        document.getElementById('inp_to_dc_info').innerHTML = `inp_to_dc:<br>x: ${xFinal}, y: ${yFinal}`;
+
         updatePixels();
     }
 }
+
