@@ -76,11 +76,10 @@ function draw() {
             desenharPixel(xFinal, ALTURA - yFinal);
         }
 
-        // Calculando valores para exibir
         const [ndcx, ndcy] = inp_to_ndc(x, y, [xMin, xMax], [yMin, yMax]);
         const [dcx, dcy] = ndc_to_dc(ndcx, ndcy, INTERVALO_X_DC, INTERVALO_Y_DC);
 
-        // Exibindo os resultados nas divs
+        
         document.getElementById('inp_to_ndc_info').innerHTML = `inp_to_ndc:<br>x: ${ndcx.toFixed(2)}, y: ${ndcy.toFixed(2)}`;
         document.getElementById('ndc_to_dc_info').innerHTML = `ndc_to_dc:<br>x: ${dcx}, y: ${dcy}`;
         document.getElementById('inp_to_dc_info').innerHTML = `inp_to_dc:<br>x: ${xFinal}, y: ${yFinal}`;
