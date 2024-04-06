@@ -33,8 +33,8 @@
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const centerX = parseInt(form.elements.centerX.value);
-        const centerY = parseInt(form.elements.centerY.value);
+        const centerX = parseInt(form.elements.centerX.value)+250;
+        const centerY = (parseInt(form.elements.centerY.value)*-1)+250;
         const radius = parseInt(form.elements.radius.value);
         drawCircle(centerX, centerY, radius);
     });
